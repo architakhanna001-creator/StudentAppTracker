@@ -2,6 +2,21 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
+import os
+
+DATA_FILE = "students.csv"
+
+# Load existing records
+if "students" not in st.session_state:
+    if os.path.exists(DATA_FILE):
+        st.session_state.students = pd.read_csv(DATA_FILE).to_dict(orient="records")
+    else:
+        st.session_state.students = []
+
+def save_students():
+    df = pd.DataFrame(st.session_state.students)
+    df.to_csv(DATA_FILE, index=False)
+
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(
@@ -75,6 +90,7 @@ elif menu == "➕ Add Student Record":
                 "Course": course,
                 "Status": status
             })
+            save_students()
             st.success(f"✅ Student {name} added successfully!")
 
 
@@ -107,6 +123,7 @@ elif menu == "✏️ Update Student Record":
                         "Course": course,
                         "Status": status
                     }
+                    save_students()
                     st.success(f"✅ Student record for Roll No {roll_no} updated successfully!")
         else:
             st.error("⚠️ Roll No not found.")
